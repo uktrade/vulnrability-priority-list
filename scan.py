@@ -313,10 +313,11 @@ for repo_name, repo in repos_with_all_vulns.items():
         continue
 
     for repo_alert in repo_alerts:
-        if repo_alert['fixedAt'] is not None:
+        if repo_alert['fixedAt'] is None or repo_alert['fixedAt'] < '2024-01-23T00:00:00Z':
             # At the time of writing, it doesn't look like GitHub's API offers filtering on
             # properties of alerts, so we exclude fixed alerts in code
             continue
+        print(repo_alert['fixedAt'])
 
         vuln = repo_alert['securityVulnerability']
         if vuln['advisory']['withdrawnAt'] is not None:
@@ -497,8 +498,8 @@ def print_csv(vulnerabilities):
     writer.writeheader()
     for vuln in vulnerabilities:
         non_closed_repos = sorted(set([repo for is_closed, repo in vuln['repo_alerts'] if not is_closed]))
-        if not non_closed_repos:
-            continue
+        #if not non_closed_repos:
+            #continue
         writer.writerow({
             "package_name": vuln['package_name'],
             "first_patched_version": vuln['first_patched_version'],
